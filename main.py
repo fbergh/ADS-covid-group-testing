@@ -1,9 +1,21 @@
 import input_output as io
+import algorithm as a
 from social_graph import SocialGraph
-import pprint
 
+
+"""
+Run this in the terminal with: ncat -c 'python3 ./main.py' group-testing.maarse.xyz 6525
+NOTE: Add a credentials file in the repository
+"""
 if __name__ == '__main__':
-    # input_values = io.get_values_from_input()
-    # g = SocialGraph(input_values)
-    g = io.get_random_graph_with_parameters()
-    pprint.pprint(g.graph)
+    io.give_credentials()
+    n_problems = io.parse_number_of_problems()
+    n_correct = 0
+    for problem in range(n_problems):
+        input_parameters = io.get_values_from_input()
+        io.eprint(input_parameters)
+        g = SocialGraph(input_parameters)
+        is_success = a.zero_point_solution(g)
+        io.eprint(f"Problem {problem}: {is_success}")
+        n_correct += is_success
+    io.eprint(f"Problems correct: {n_correct}/{n_problems}")
