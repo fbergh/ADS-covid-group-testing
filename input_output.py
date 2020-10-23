@@ -1,3 +1,9 @@
+import random as r
+from collections import defaultdict
+from social_graph import SocialGraph
+import pprint
+
+
 def get_values_from_input():
     """
     From the assignment:
@@ -21,7 +27,7 @@ def get_values_from_input():
         n_edges = max_edges if n_edges > max_edges else n_edges
 
         n_initially_infected = int(input())
-        n_initially_infected = n_nodes if n_initially_infected > n_nodes else n_initially_infected
+        n_initially_infected = int(0.7 * n_nodes) if n_initially_infected > int(0.7 * n_nodes) else n_initially_infected
 
         p_infection = float(input())
         assert 0 < p_infection < 1, "Infection probability should be greater than 0 and smaller than 1"
@@ -52,7 +58,63 @@ def get_values_from_input():
             "idcs_connected_nodes": idcs_connected_nodes}
 
 
+def get_random_graph_with_parameters(seed=r.random()):
+    print(f"Constructing random graph for seed {seed}")
+    r.seed(seed)
+    n_nodes = r.randint(2, 10)
+    max_edges = n_nodes * (n_nodes - 1) // 2
+    n_edges = r.randint(n_nodes - 1, max_edges)
+    n_initially_infected = r.randint(1, int(0.7 * n_nodes))
+    p_infection = r.random()
+    lower_bound = 1 if n_initially_infected == 1 else r.randint(1, n_initially_infected)
+    upper_bound = n_initially_infected if n_initially_infected == int(0.7 * n_nodes) \
+        else r.randint(n_initially_infected, int(0.7 * n_nodes))
+    parameters = {"n_nodes": n_nodes, "n_edges": n_edges, "n_initially_infected": n_initially_infected,
+                  "p_infection": p_infection, "lower_bound": lower_bound, "upper_bound": upper_bound}
+    print("The graph has the following parameters:")
+    pprint.pprint(parameters)
+    random_graph = _build_random_graph(n_nodes, n_edges)
+    return SocialGraph(random_graph, parameters)
+
+
+def _build_random_graph(n_nodes, n_edges):
+    graph = SocialGraph(_generate_base_graph(n_nodes))
+    for _ in range(n_nodes - 1, n_edges):
+        node1 = r.randrange(0, n_nodes)
+        # If node1 is already fully connected
+        while len(graph.graph[node1]) == n_nodes - 1:
+            node1 = r.randrange(0, n_nodes)
+        possible_connections = set(range(n_nodes)) - {node1} - graph.graph[node1]
+        node2 = r.sample(possible_connections, 1)[0]
+        if node1 == node2:
+            print("?")
+        graph.add(node1, node2)
+    return graph
+
+
+def _generate_base_graph(n_nodes):
+    base_graph = defaultdict(set)
+    connected = set()
+    for _ in range(n_nodes - 1):
+        node1 = r.sample(set(range(n_nodes)) - connected, 1)[0]
+        # Take set difference
+        possible_connections = set(range(n_nodes)) - {node1} - connected
+        # random.sample returns a list
+        node2 = r.sample(possible_connections, 1)[0]
+
+        base_graph[node1].add(node2)
+        base_graph[node2].add(node1)
+        # if len(base_graph[node1]) >= 2:
+        connected.update([node1])
+        # if len(base_graph[node2]) >= 2:
+        #     connected.update([node2])
+    return base_graph
+
+
 # Test function
 if __name__ == "__main__":
-    input_values = get_values_from_input()
-    print(input_values)
+    seed = r.random()
+    print(seed)
+    r.seed(seed)
+    g = _generate_base_graph(5)
+    pprint.pprint(g)
