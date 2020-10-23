@@ -17,7 +17,7 @@ def get_values_from_input():
         n_nodes = int(input())
 
         n_edges = int(input())
-        max_edges = int(n_nodes * (n_nodes - 1) / 2)
+        max_edges = n_nodes * (n_nodes - 1) // 2
         n_edges = max_edges if n_edges > max_edges else n_edges
 
         n_initially_infected = int(input())
@@ -26,10 +26,6 @@ def get_values_from_input():
         p_infection = float(input())
         assert 0 < p_infection < 1, "Infection probability should be greater than 0 and smaller than 1"
 
-        # x = input().strip().split(" ")
-        # a, b = x
-        # print(x, a, b)
-        # lower_bound, upper_bound = 0, 0
         lower_bound, upper_bound = input().strip().split(" ")
         lower_bound = int(lower_bound)
         assert 0 < lower_bound <= n_initially_infected, "Lower bound should be greater than 0 and smaller than the " \
