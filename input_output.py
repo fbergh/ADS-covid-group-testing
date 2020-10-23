@@ -2,6 +2,42 @@ import random as r
 from collections import defaultdict
 from social_graph import SocialGraph
 import pprint
+import sys
+
+
+def give_credentials():
+    with open('credentials') as c:
+        username, password = c.readline().split(" ")
+    print(username)
+    print(password)
+
+
+def parse_number_of_problems():
+    n_problems = int(input())
+    eprint(f"Number of problems: {n_problems}")
+    return n_problems
+
+
+def send_test(nodes):
+    if type(nodes) == int:
+        print("test", nodes, flush=True)
+    else:
+        print("test", *nodes, flush=True)
+
+
+def send_answer(nodes):
+    if type(nodes) == int:
+        print("answer", nodes, flush=True)
+    else:
+        print("answer", *nodes, flush=True)
+
+
+def get_test_result():
+    return bool(input())
+
+
+def get_problem_result():
+    return input() == "success"
 
 
 def get_values_from_input():
@@ -34,12 +70,10 @@ def get_values_from_input():
 
         lower_bound, upper_bound = input().strip().split(" ")
         lower_bound = int(lower_bound)
-        assert 0 < lower_bound <= n_initially_infected, "Lower bound should be greater than 0 and smaller than the " \
-                                                        "number of initially infected people "
         upper_bound = int(upper_bound)
-        assert n_initially_infected <= upper_bound <= 0.7 * n_nodes, "Upper bound should be greater than the number " \
-                                                                     "of initially infected people and smaller than " \
-                                                                     "0.7 * number of nodes "
+        assert 0 < lower_bound <= upper_bound, "Lower bound should be greater than 0 and smaller than the upper bound"
+        assert lower_bound <= upper_bound <= 0.7 * n_nodes, "Upper bound should be greater than the lower bound and " \
+                                                            "smaller than 0.7 * number of nodes "
 
         idcs_connected_nodes = []
         for _ in range(n_edges):
@@ -109,6 +143,13 @@ def _generate_base_graph(n_nodes):
         # if len(base_graph[node2]) >= 2:
         #     connected.update([node2])
     return base_graph
+
+
+def eprint(*args, **kwargs):
+    """
+    Print to stderror (which logs to console for group testing server)
+    """
+    print(*args, file=sys.stderr, **kwargs)
 
 
 # Test function
