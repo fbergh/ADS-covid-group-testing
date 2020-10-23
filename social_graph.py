@@ -13,6 +13,18 @@ class SocialGraph(object):
         self._graph = defaultdict(set)
         self.add_connections()
 
+    def __init__(self, graph, input_values={}):
+        """
+        Constructor for initialising with a base graph of type SocialGraph
+        or of type defaultdict(set), in which case input_values can be empty
+        """
+        if type(graph) == SocialGraph:
+            # Initialises all parameters in input_values as class parameters
+            self.__dict__.update(input_values)
+            self._graph = graph.graph
+        else:
+            self._graph = graph
+
     def add_connections(self):
         """ Add connections (list of tuple pairs) to graph """
         for node1, node2 in self.idcs_connected_nodes:
