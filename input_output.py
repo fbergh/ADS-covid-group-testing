@@ -33,7 +33,7 @@ def send_answer(nodes):
 
 
 def get_test_result():
-    return bool(input())
+    return input() == "true"
 
 
 def get_problem_result():
@@ -112,7 +112,7 @@ def get_random_graph_with_parameters(seed=r.random()):
 
 
 def _build_random_graph(n_nodes, n_edges):
-    graph = SocialGraph(_generate_base_graph(n_nodes))
+    graph = SocialGraph(_generate_base_graph(n_nodes), {})
     for _ in range(n_nodes - 1, n_edges):
         node1 = r.randrange(0, n_nodes)
         # If node1 is already fully connected
