@@ -13,8 +13,7 @@ if __name__ == '__main__':
     n_correct = 0
     for problem in range(n_problems):
         input_parameters = io.get_values_from_input()
-        io.eprint(input_parameters)
-        g = SocialGraph(input_parameters)
+        g = SocialGraph(None, input_parameters)
         is_success = a.zero_point_solution(g)
         io.eprint(f"Problem {problem}: {is_success}")
         n_correct += is_success
