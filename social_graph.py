@@ -7,21 +7,15 @@ class SocialGraph(object):
     Inspired by: https://stackoverflow.com/questions/1639174/creating-class-instance-properties-from-a-dictionary
     """
 
-    def __init__(self, input_values):
+    def __init__(self, graph, input_values):
         # Initialises all parameters in input_values as class parameters
         self.__dict__.update(input_values)
-        self._graph = defaultdict(set)
-        self.add_connections()
-
-    def __init__(self, graph, input_values={}):
-        """
-        Constructor for initialising with a base graph of type SocialGraph
-        or of type defaultdict(set), in which case input_values can be empty
-        """
+        # Constructor overloading is not supported in Python, so do it like this
         if type(graph) == SocialGraph:
-            # Initialises all parameters in input_values as class parameters
-            self.__dict__.update(input_values)
             self._graph = graph.graph
+        elif graph is None:
+            self._graph = defaultdict(set)
+            self.add_connections()
         else:
             self._graph = graph
 
