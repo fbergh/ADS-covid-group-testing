@@ -15,47 +15,44 @@ def zero_point_solution(graph):
     return is_success, n_tests
 
 
-def basic_divide_and_conquer(graph):
-    positive_result_idcs, n_tests = basic_dc_helper(0, graph.n_nodes - 1, 0)
+def divide_and_conquer(graph, n):
+    positive_result_idcs, n_tests = dc_helper(n, 0, graph.n_nodes - 1, 0)
 
     io.send_answer(positive_result_idcs)
     is_success = io.get_problem_result()
     return is_success, n_tests
 
 
-def basic_dc_helper(p, r, n_tests):
-    # Base case: test one person and return their index if positive
-    if p == r:
-        io.send_test(p)
-        if io.get_test_result():
-            return [p], 1
-    # Other base case: test two persons and return their index if positive
-    if p + 1 == r:
+def dc_helper(n, p, r, n_tests):
+    # Base case: if the group size is smaller than or equal to the number of groups to be tested, test everyone
+    if r - p + 1 <= n:
         tested_positive = []
-        io.send_test(p)
-        if io.get_test_result():
-            tested_positive.append(p)
-        io.send_test(r)
-        if io.get_test_result():
-            tested_positive.append(r)
-        return tested_positive, 2
-    # Recursive case: test two halves and recurse if either half is positive
+        for node in range(p, r + 1):
+            io.send_test(node)
+            if io.get_test_result():
+                tested_positive.append(node)
+            n_tests += 1
+        return tested_positive, n_tests
+
+    # Recursive case: test n groups and recurse on group if that group is positive
     positive_result_idcs = []
-    q = int((p + r) / 2)
+    # NOTE: determining q like this is not guaranteed to be correct (e.g. take n=4, p=0, and q=5)
+    q = math.ceil((r - p + 1) / n)
 
-    io.send_test(range(p, q + 1))
-    if io.get_test_result():
-        _positive_result_idcs, _n_tests = basic_dc_helper(p, q, 0)
-        positive_result_idcs.extend(_positive_result_idcs)
-        n_tests += _n_tests
+    for node in range(p, r + 1, q):
+        end_node = min(r + 1, node + q)
+        io.send_test(range(node, end_node))
+        if io.get_test_result():
+            # If the group consists of a single note, do base case here
+            if node + 1 == end_node:
+                positive_result_idcs.append(node)
+                n_tests += 1
+            else:
+                _positive_result_idcs, _n_tests = dc_helper(n, node, end_node - 1, 0)
+                positive_result_idcs.extend(_positive_result_idcs)
+                n_tests += _n_tests
 
-    io.send_test(range(q + 1, r + 1))
-    if io.get_test_result():
-        _positive_result_idcs, _n_tests = basic_dc_helper(q + 1, r, 0)
-        positive_result_idcs.extend(_positive_result_idcs)
-        n_tests += _n_tests
-
-    n_tests += 2
+    n_tests += n
 
     return positive_result_idcs, n_tests
 
