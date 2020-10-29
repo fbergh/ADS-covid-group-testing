@@ -14,32 +14,39 @@ def zero_point_solution(graph):
 
 
 def basic_divide_and_conquer(graph):
-    positive_result_idcs = basic_dc_helper(0,graph.n_nodes)
+    positive_result_idcs = basic_dc_helper(0, graph.n_nodes - 1)
 
     io.send_answer(positive_result_idcs)
     is_success = io.get_problem_result()
     return is_success
 
-def basic_dc_helper(p,r):
+
+def basic_dc_helper(p, r):
     # Base case: test one person and return their index if positive
-    if p + 1 == r:
+    if p == r:
         io.send_test(p)
         if io.get_test_result():
             return [p]
-        else:
-            return []
+    # Other base case: test two persons and return their index if positive
+    if p + 1 == r:
+        tested_positive = []
+        io.send_test(p)
+        if io.get_test_result():
+            tested_positive.append(p)
+        io.send_test(r)
+        if io.get_test_result():
+            tested_positive.append(r)
+        return tested_positive
     # Recursive case: test two halves and recurse if either half is positive
     positive_result_idcs = []
-    q = int((p + r)/2)
+    q = int((p + r) / 2)
 
-    io.send_test(range(p,q))
+    io.send_test(range(p, q + 1))
     if io.get_test_result():
-        positive_result_idcs.extend(basic_dc_helper(p,q))
-        
-    io.send_test(range(q,r))
+        positive_result_idcs.extend(basic_dc_helper(q + 1, r))
+
+    io.send_test(range(q + 1, r + 1))
     if io.get_test_result():
-        positive_result_idcs.extend(basic_dc_helper(p,q))
-        
+        positive_result_idcs.extend(basic_dc_helper(p, q))
+
     return positive_result_idcs
-        
-        
