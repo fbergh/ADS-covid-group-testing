@@ -4,6 +4,12 @@ from social_graph import SocialGraph
 import pprint
 import sys
 
+def pretty_print_input_params(input_params):
+    for k, v in input_params.items():
+        if k == "idcs_connected_nodes":
+            continue
+        eprint(f"{k:20} = {v}")
+
 
 def give_credentials():
     with open('credentials') as c:
