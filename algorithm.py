@@ -61,7 +61,7 @@ def basic_dc_helper(p, r, n_tests):
 
 
 def dorfman_test(graph):
-    # NOTE: p_infection is not the right probability to choose, we can refine this
+    # NOTE: p_infection is not the right probability to choose, we can refine t
     n = _get_optimal_group_size(graph.p_infection)
 
     n_groups = graph.n_nodes // n
