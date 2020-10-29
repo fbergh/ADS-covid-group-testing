@@ -4,6 +4,7 @@ from social_graph import SocialGraph
 import pprint
 import sys
 
+
 def pretty_print_input_params(input_params):
     for k, v in input_params.items():
         if k == "idcs_connected_nodes":
@@ -98,10 +99,11 @@ def get_values_from_input():
             "idcs_connected_nodes": idcs_connected_nodes}
 
 
-def get_random_graph_with_parameters(seed=r.random()):
+def get_random_graph_with_parameters(n_nodes=None, seed=r.random()):
     print(f"Constructing random graph for seed {seed}")
     r.seed(seed)
-    n_nodes = r.randint(2, 10)
+    if n_nodes is None:
+        n_nodes = r.randint(2, 10)
     max_edges = n_nodes * (n_nodes - 1) // 2
     n_edges = r.randint(n_nodes - 1, max_edges)
     n_initially_infected = r.randint(1, int(0.7 * n_nodes))
