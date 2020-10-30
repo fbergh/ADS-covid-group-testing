@@ -2,103 +2,148 @@ import input_output as io
 import math
 
 
-def zero_point_solution(graph):
-    # First test everything, then read everything (faster than having to wait for output each time)
-    for node in range(graph.n_nodes):
-        io.send_test(node)
-
-    positive_result_idcs = [node for node in range(graph.n_nodes) if io.get_test_result()]
-    io.send_answer(positive_result_idcs)
-
-    is_success = io.get_problem_result()
-    n_tests = graph.n_nodes
-    return is_success, n_tests
+class Algorithm(object):
+    def run(self, graph):
+        raise NotImplementedError
 
 
-def divide_and_conquer(graph, n):
-    positive_result_idcs, n_tests = dc_helper(n, 0, graph.n_nodes - 1, 0)
+class ZeroPointSolution(Algorithm):
+    def __init__(self):
+        super().__init__()
+        self.name = "zero_point_solution"
 
-    io.send_answer(positive_result_idcs)
-    is_success = io.get_problem_result()
-    return is_success, n_tests
-
-
-def dc_helper(n, p, r, n_tests):
-    # Base case: if the group size is smaller than or equal to the number of groups to be tested, test everyone
-    if r - p + 1 <= n:
-        tested_positive = []
-        for node in range(p, r + 1):
+    def run(self, graph):
+        # First test everything, then read everything (faster than having to wait for output each time)
+        for node in range(graph.n_nodes):
             io.send_test(node)
-            if io.get_test_result():
-                tested_positive.append(node)
-            n_tests += 1
-        return tested_positive, n_tests
 
-    # Recursive case: test n groups and recurse on group if that group is positive
-    positive_result_idcs = []
-    # NOTE: determining q like this is not guaranteed to be correct (e.g. take n=4, p=0, and q=5)
-    q = math.ceil((r - p + 1) / n)
+        positive_result_idcs = [node for node in range(graph.n_nodes) if io.get_test_result()]
+        io.send_answer(positive_result_idcs)
 
-    for node in range(p, r + 1, q):
-        end_node = min(r + 1, node + q)
-        io.send_test(range(node, end_node))
-        if io.get_test_result():
-            # If the group consists of a single note, do base case here
-            if node + 1 == end_node:
-                positive_result_idcs.append(node)
+        is_success = io.get_problem_result()
+        n_tests = graph.n_nodes
+        return is_success, n_tests
+
+
+class DivideAndConquer(Algorithm):
+    def __init__(self, n_groups=None):
+        self.n_groups = n_groups
+        self.name = "divide_and_conquer"
+
+    def run(self, graph):
+        if self.n_groups is None:
+            p_infection = _calculate_p_infection(graph)
+            group_size = _get_optimal_group_size(p_infection, graph.upper_bound)
+            n_groups = graph.n_nodes // group_size + 1
+        else:
+            n_groups = self.n_groups
+
+        positive_result_idcs, n_tests = self.dc_helper(n_groups, 0, graph.n_nodes - 1, 0)
+
+        io.send_answer(positive_result_idcs)
+        is_success = io.get_problem_result()
+        return is_success, n_tests
+
+    def dc_helper(self, n, p, r, n_tests):
+        # Base case: if the group size is smaller than or equal to the number of groups to be tested, test everyone
+        if r - p + 1 <= n:
+            tested_positive = []
+            for node in range(p, r + 1):
+                io.send_test(node)
+                if io.get_test_result():
+                    tested_positive.append(node)
                 n_tests += 1
-            else:
-                _positive_result_idcs, _n_tests = dc_helper(n, node, end_node - 1, 0)
-                positive_result_idcs.extend(_positive_result_idcs)
-                n_tests += _n_tests
+            return tested_positive, n_tests
 
-    n_tests += n
+        # Recursive case: test n groups and recurse on group if that group is positive
+        positive_result_idcs = []
+        # NOTE: determining q like this is not guaranteed to be correct (e.g. take n=4, p=0, and q=5)
+        q = math.ceil((r - p + 1) / n)
 
-    return positive_result_idcs, n_tests
-
-
-def dorfman_test(graph):
-    # NOTE: p_infection is not the right probability to choose, we can refine t
-    n = _get_optimal_group_size(graph.p_infection)
-
-    n_groups = graph.n_nodes // n
-    if not graph.n_nodes % n == 0:
-        n_groups += 1
-    n_tests = n_groups
-    nodes = list(range(graph.n_nodes))
-    # Test groups of size n
-    for g_idx in range(0, graph.n_nodes, n):
-        io.send_test(nodes[g_idx:min(g_idx + n, graph.n_nodes)])
-    group_results = [io.get_test_result() for _ in range(n_groups)]
-
-    # For all positively tested groups, test individuals
-    for g_idx, is_positive in enumerate(group_results):
-        if not is_positive:
-            pass
-        for node in range(g_idx * n, min((g_idx + 1) * n, graph.n_nodes)):
-            io.send_test(node)
-            n_tests += 1
-
-    # Get individual results
-    positive_result_idcs = []
-    for g_idx, is_positive in enumerate(group_results):
-        if not is_positive:
-            pass
-        for node in range(g_idx * n, min((g_idx + 1) * n, graph.n_nodes)):
+        for node in range(p, r + 1, q):
+            end_node = min(r + 1, node + q)
+            io.send_test(range(node, end_node))
             if io.get_test_result():
-                positive_result_idcs.append(node)
+                # If the group consists of a single note, do base case here
+                if node + 1 == end_node:
+                    positive_result_idcs.append(node)
+                    n_tests += 1
+                else:
+                    _positive_result_idcs, _n_tests = self.dc_helper(n, node, end_node - 1, 0)
+                    positive_result_idcs.extend(_positive_result_idcs)
+                    n_tests += _n_tests
 
-    io.send_answer(positive_result_idcs)
-    is_success = io.get_problem_result()
-    return is_success, n_tests
+        n_tests += n
+
+        return positive_result_idcs, n_tests
 
 
-def _get_optimal_group_size(p_infection):
+class DorfmanTest(Algorithm):
+    def __init__(self, group_size=None):
+        self.group_size = group_size
+        self.name = "dorfman_test"
+
+    def run(self, graph):
+        if self.group_size is None:
+            p_infection = _calculate_p_infection(graph)
+            n = _get_optimal_group_size(p_infection, graph.upper_bound)
+        else:
+            n = self.group_size
+
+        n_groups = graph.n_nodes // n
+        if not graph.n_nodes % n == 0:
+            n_groups += 1
+        n_tests = n_groups
+        nodes = list(range(graph.n_nodes))
+        # Test groups of size n
+        for g_idx in range(0, graph.n_nodes, n):
+            io.send_test(nodes[g_idx:min(g_idx + n, graph.n_nodes)])
+        group_results = [io.get_test_result() for _ in range(n_groups)]
+
+        # For all positively tested groups, test individuals
+        for g_idx, is_positive in enumerate(group_results):
+            if not is_positive:
+                pass
+            for node in range(g_idx * n, min((g_idx + 1) * n, graph.n_nodes)):
+                io.send_test(node)
+                n_tests += 1
+
+        # Get individual results
+        positive_result_idcs = []
+        for g_idx, is_positive in enumerate(group_results):
+            if not is_positive:
+                pass
+            for node in range(g_idx * n, min((g_idx + 1) * n, graph.n_nodes)):
+                if io.get_test_result():
+                    positive_result_idcs.append(node)
+
+        io.send_answer(positive_result_idcs)
+        is_success = io.get_problem_result()
+        return is_success, n_tests
+
+
+def _calculate_p_infection(graph):
+    n_nodes, n_edges, p_infect_neighbour = graph.n_nodes, graph.n_edges, graph.p_infection
+    avg_n_edges_per_node = round(n_edges / (n_nodes - 1))
+    if avg_n_edges_per_node <= 1:
+        return p_infect_neighbour
+    else:
+        N = avg_n_edges_per_node
+        p_infection = 0
+        p_infected = (graph.lower_bound + graph.upper_bound) // 2 / n_nodes
+        # i represents a hypothetical number of infections
+        for i in range(1, N + 1):
+            p_will_infect = p_infected * p_infect_neighbour
+            p_infection += math.comb(math.floor(N), i) * p_will_infect ** i * (1 - p_will_infect) ** (N - i)
+        return p_infection
+
+
+def _get_optimal_group_size(p_infection, upper_bound):
     """
     Based on https://blogs.sas.com/content/iml/2020/07/06/pool-testing-covid19.html
     """
     max_test_reduction, best_k = math.inf, 0
-    for k in range(1, 20):
+    for k in range(1, upper_bound):
         test_reduction = test_reduction_proportion(p_infection, k)
         if test_reduction < max_test_reduction:
             max_test_reduction = test_reduction
