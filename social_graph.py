@@ -1,5 +1,10 @@
+########## IMPORTS ##########
+
+# Standard libary imports
 from collections import defaultdict
 
+
+########## GRAPH CLASS ##########
 
 class SocialGraph(object):
     """

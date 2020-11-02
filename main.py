@@ -1,15 +1,26 @@
+########## IMPORTS ##########
+
+# Standard libary imports
+import time
+
+# Self-defined imports
 import input_output as io
 from algorithm import DivideAndConquer, DorfmanTest, ZeroPointSolution
 from social_graph import SocialGraph
-import time
 from logger import Logger
 
+
+########## CONSTANTS ##########
 
 logs_dir = "./logs"
 
 
+########## RUNNING ALGORITHMS ##########
+
 def test_server():
     """
+    Run an algorithm on all problems on the server
+
     Run this in the terminal with: ncat -c 'python3 ./main.py' group-testing.maarse.xyz 6525
     NOTE: Add a credentials file in the repository
     """
@@ -42,18 +53,20 @@ def test_server():
     l.log_algorithm_with_results(algorithm.name, total_time, proportion_test, proportion_correct)
     l.close()
 
-
 def test_random_graph():
     """
-    Useful for debugging
+    Run an algorithm on a random test graph (useful for debugging)
     """
     start_time = time.time()
+    algorithm = DorfmanTest()
     n_tests = 0
     g = io.get_random_graph_with_parameters(n_nodes=10)
-    is_success, n_tests = a.dorfman_test(g)
+    is_success, n_tests = algorithm.run(g)
     io.eprint(f"Time elapsed      = {time.time() - start_time} sec")
     io.eprint(f"Total tests/nodes = {n_tests}/{g.n_nodes}")
 
+
+########## RUN FILE ##########
 
 if __name__ == '__main__':
     test_server()

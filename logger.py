@@ -1,7 +1,12 @@
+########## IMPORTS ##########
+
+# Standard libary imports
 import os
 import datetime
 import json
 
+
+########## LOGGER CLASS ##########
 
 class Logger:
     def __init__(self, path):
@@ -14,6 +19,9 @@ class Logger:
         self.log = {'problems': [], 'results': {}}
 
     def log_problem(self, problem_params, is_success, n_tests):
+        """
+        Log a given problem, whether the algorithm succeeded in solving it and the number of tests the algorithm used
+        """
         # Delete specific connections to avoid clutter
         del problem_params["idcs_connected_nodes"]
 
@@ -25,9 +33,14 @@ class Logger:
         self.log["problems"].append(problem_dict)
 
     def log_algorithm_with_results(self, algorithm, total_time, proportion_test, proportion_correct):
+        """
+        Log the result of an algorithm after running it on all problems on the server
+        """
         self.filename = f"{proportion_test:.3f}_{algorithm}_{self.date}.json"
 
-        results = {"algorithm": algorithm, "total_time": total_time, "test_proportion": proportion_test,
+        results = {"algorithm": algorithm, 
+                   "total_time": total_time, 
+                   "test_proportion": proportion_test,
                    "total_correct": proportion_correct}
 
         self.log["results"].update(results)
