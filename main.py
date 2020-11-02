@@ -5,7 +5,7 @@ import time
 
 # Self-defined imports
 import input_output as io
-from algorithm import DivideAndConquer, DorfmanTest, ZeroPointSolution
+from algorithm import DivideAndConquerBasic, DivideAndConquerBFS, DorfmanTest, ZeroPointSolution
 from social_graph import SocialGraph
 from logger import Logger
 
@@ -29,7 +29,7 @@ def test_server():
     n_correct, total_n_tests, total_n_nodes = 0, 0, 0
     start_time = time.time()
     l = Logger(logs_dir)
-    algorithm = ZeroPointSolution()
+    algorithm = DivideAndConquerBFS()
 
     for problem in range(n_problems):
         input_parameters = io.get_values_from_input()

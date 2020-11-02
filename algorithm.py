@@ -98,13 +98,14 @@ class DivideAndConquerBFS(Algorithm):
         self.name = "bfs_divide_and_conquer"
     
     def run(self, graph):
-        # If min_groups is undefined, set it to the "optimal" number
-        if self.min_groups is None:
-            p_infection = _calculate_p_infection(graph)
-            group_size = _get_optimal_group_size(p_infection, graph.upper_bound)
-            min_groups = graph.n_nodes // group_size + 1
-        else:
-            min_groups = self.min_groups
+        # # If min_groups is undefined, set it to the "optimal" number
+        # if self.min_groups is None:
+        #     p_infection = _calculate_p_infection(graph)
+        #     group_size = _get_optimal_group_size(p_infection, graph.upper_bound)
+        #     min_groups = graph.n_nodes // group_size + 1
+        # else:
+        #     min_groups = self.min_groups
+        min_groups = int(graph.n_nodes/10)
         
         # Run Divide-and-Conquer, using BFS to split the problem into subproblems
         positive_result_idcs, n_tests = self.dc_bfs_helper(graph, list(range(graph.n_nodes)), min_groups)
@@ -131,7 +132,7 @@ class DivideAndConquerBFS(Algorithm):
         for group in groups:
             io.send_test(group)
             if io.get_test_result():
-                _positive_result_idcs, _n_tests = self.dc_helper(graph, group, k)
+                _positive_result_idcs, _n_tests = self.dc_bfs_helper(graph, group, k)
                 positive_result_idcs.extend(_positive_result_idcs)
                 n_tests += _n_tests
         return positive_result_idcs, n_tests
@@ -243,7 +244,7 @@ def _get_optimal_group_size(p_infection, upper_bound):
         if test_reduction < max_test_reduction:
             max_test_reduction = test_reduction
             best_k = k
-    return best_k
+    return max(best_k, 2)
 
 
 def test_reduction_proportion(p, k):
