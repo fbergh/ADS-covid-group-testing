@@ -39,6 +39,34 @@ def test_reduction_proportion(p, k):
     return 1 / k + 1 - (1 - p) ** k
 
 
+def connected_compoment_analysis(graph):
+    # Initially mark all vertices as unvisited
+    visited = {v: False for v in range(graph.n_nodes)}
+    # List for keeping track of connected components
+    cc = []
+
+    for v in range(graph.n_nodes):
+        # Starting from an unvisited vertex v, find all vertices reachable from v
+        if not visited[v]:
+            component = _cca_dfs_helper(graph, v, visited)
+            cc.append(component)
+
+    return cc
+
+
+def _cca_dfs_helper(graph, v, visited):
+    # Mark the parent vertex as visited and add it to the current component
+    visited[v] = True
+    component = [v]
+
+    for nb in graph.graph[v]:
+        # For every unvisited neighbour nb, find all vertices reachable from nb
+        if not visited[nb]:
+            component.extend(_cca_dfs_helper(graph, nb, visited))
+
+    return component
+
+
 ########## RUN FILE (BUGFIXING) ##########
 
 if __name__ == "__main__":
