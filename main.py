@@ -2,12 +2,14 @@
 
 # Standard libary imports
 import time
+import os
 
 # Self-defined imports
 import input_output as io
-from algorithm import DivideAndConquerBasic, DivideAndConquerBFS, DorfmanTest, ZeroPointSolution
 from social_graph import SocialGraph
 from logger import Logger
+from algorithms import ZeroPointSolution, DivideAndConquerBasic, DivideAndConquerBFS, DorfmanTest
+
 
 
 ########## CONSTANTS ##########
@@ -58,7 +60,7 @@ def test_random_graph():
     Run an algorithm on a random test graph (useful for debugging)
     """
     start_time = time.time()
-    algorithm = DorfmanTest()
+    algorithm = ZeroPointSolution()
     n_tests = 0
     g = io.get_random_graph_with_parameters(n_nodes=10)
     is_success, n_tests = algorithm.run(g)
