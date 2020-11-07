@@ -122,13 +122,17 @@ def eprint(*args, **kwargs):
 
 ########## DEBUGGING & TESTING ##########
 
-def get_random_graph_with_parameters(n_nodes=None, seed=r.random()):
+def get_random_graph_with_parameters(n_nodes=None, n_edges=None, seed=r.random(), is_connected=True):
     print(f"Constructing random graph for seed {seed}")
     r.seed(seed)
+
     if n_nodes is None:
         n_nodes = r.randint(2, 10)
-    max_edges = n_nodes * (n_nodes - 1) // 2
-    n_edges = r.randint(n_nodes - 1, max_edges)
+
+    if n_edges is None:
+        max_edges = n_nodes * (n_nodes - 1) // 2
+        n_edges = r.randint(n_nodes - 1, max_edges)
+
     n_initially_infected = r.randint(1, int(0.7 * n_nodes))
     p_infection = r.random()
     lower_bound = 1 if n_initially_infected == 1 else r.randint(1, n_initially_infected)
@@ -138,24 +142,27 @@ def get_random_graph_with_parameters(n_nodes=None, seed=r.random()):
                   "p_infection": p_infection, "lower_bound": lower_bound, "upper_bound": upper_bound}
     print("The graph has the following parameters:")
     pprint.pprint(parameters)
-    random_graph = _build_random_graph(n_nodes, n_edges)
+    random_graph = _build_random_graph(n_nodes, n_edges, is_connected)
     return SocialGraph(random_graph, parameters)
 
-def _build_random_graph(n_nodes, n_edges):
-    graph = SocialGraph(_generate_base_graph(n_nodes), {})
-    for _ in range(n_nodes - 1, n_edges):
+def _build_random_graph(n_nodes, n_edges, is_connected=True):
+    if is_connected:
+        graph = SocialGraph(_generate_connected_base_graph(n_nodes), {})
+    else:
+        graph = SocialGraph(defaultdict(set), {})
+    lower_bound = n_nodes - 1 if is_connected else 0
+
+    for _ in range(lower_bound, n_edges):
         node1 = r.randrange(0, n_nodes)
         # If node1 is already fully connected
         while len(graph.graph[node1]) == n_nodes - 1:
             node1 = r.randrange(0, n_nodes)
         possible_connections = set(range(n_nodes)) - {node1} - graph.graph[node1]
         node2 = r.sample(possible_connections, 1)[0]
-        if node1 == node2:
-            print("?")
         graph.add(node1, node2)
     return graph
 
-def _generate_base_graph(n_nodes):
+def _generate_connected_base_graph(n_nodes):
     base_graph = defaultdict(set)
     connected = set()
     for _ in range(n_nodes - 1):
@@ -167,10 +174,7 @@ def _generate_base_graph(n_nodes):
 
         base_graph[node1].add(node2)
         base_graph[node2].add(node1)
-        # if len(base_graph[node1]) >= 2:
         connected.update([node1])
-        # if len(base_graph[node2]) >= 2:
-        #     connected.update([node2])
     return base_graph
 
 

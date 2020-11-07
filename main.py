@@ -2,13 +2,14 @@
 
 # Standard libary imports
 import time
-import os
+import sys
 
 # Self-defined imports
 import input_output as io
 from social_graph import SocialGraph
 from logger import Logger
-from algorithms import ZeroPointSolution, DivideAndConquerBasic, DivideAndConquerBFS, DorfmanTest, ContactGroupTesting
+from algorithms import ZeroPointSolution, DivideAndConquerBasic, DivideAndConquerBFS, DorfmanTest
+from algorithms.algorithm_utils import connected_compoment_analysis
 
 
 
@@ -26,6 +27,8 @@ def test_server():
     Run this in the terminal with: ncat -c 'python3 ./main.py' group-testing.maarse.xyz 6525
     NOTE: Add a credentials file in the repository
     """
+    # Set recursion limit higher (default: 1000), otherwise connected_component_analysis might now run
+    sys.setrecursionlimit(2000)
     io.give_credentials()
     n_problems = io.parse_number_of_problems()
     n_correct, total_n_tests, total_n_nodes = 0, 0, 0
