@@ -34,18 +34,6 @@ class SocialGraph(object):
         self._graph[node1].add(node2)
         self._graph[node2].add(node1)
 
-    def remove(self, node):
-        """ Remove all references to node """
-        for n, cxns in self._graph.items():
-            try:
-                cxns.remove(node)
-            except KeyError:
-                pass
-        try:
-            del self._graph[node]
-        except KeyError:
-            pass
-
     def is_connected(self, node1, node2):
         """ Is node1 directly connected to node2 """
         return node1 in self._graph and node2 in self._graph[node1]
