@@ -4,3 +4,4 @@ from .zero_point_solution import ZeroPointSolution
 from .divide_and_conquer_basic import DivideAndConquerBasic
 from .divide_and_conqer_bfs import DivideAndConquerBFS
 from .dorfman_test import DorfmanTest
+from .contact_group_testing import ContactGroupTesting

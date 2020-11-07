@@ -34,10 +34,11 @@ def test_server():
     n_correct, total_n_tests, total_n_nodes = 0, 0, 0
     start_time = time.time()
     l = Logger(logs_dir)
-    algorithm = DivideAndConquerBFS()
+    algorithm = ContactGroupTesting()
 
     for problem in range(n_problems):
         input_parameters = io.get_values_from_input()
+        io.pretty_print_input_params(input_parameters) # FOR TESTING PURPOSES
         g = SocialGraph(None, input_parameters)
         is_success, n_tests = algorithm.run(g)
         io.eprint(f"Problem {(problem + 1):<12} = {is_success}")
