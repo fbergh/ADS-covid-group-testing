@@ -4,6 +4,7 @@
 
 credentials
 logs/
+.idea/
 
 ############
 ## Python ##
