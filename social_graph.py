@@ -6,12 +6,10 @@ from collections import defaultdict
 
 ########## GRAPH CLASS ##########
 
-class SocialGraph(object):
+class SocialGraph:
     """
     Undirected graph data structure for a social graph
-    Inspired by: https://stackoverflow.com/questions/1639174/creating-class-instance-properties-from-a-dictionary
     """
-
     def __init__(self, graph, input_values):
         # Initialises all parameters in input_values as class parameters
         self.__dict__.update(input_values)
@@ -37,6 +35,13 @@ class SocialGraph(object):
     def is_connected(self, node1, node2):
         """ Is node1 directly connected to node2 """
         return node1 in self._graph and node2 in self._graph[node1]
+
+    def n_edges_in_component(self, component):
+        """ Compute the number of edges within a given component (correct only if the component is connected) """
+        edges = []
+        for node in component:
+            edges.extend(self.graph[node])
+        return len(edges) // 2
 
     def __str__(self):
         return '{}({})'.format(self.__class__.__name__, dict(self._graph))
