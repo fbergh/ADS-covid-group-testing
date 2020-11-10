@@ -17,7 +17,7 @@ class ClusterGroupTesting(Algorithm):
     ### INITIALIZATION ###
 
     def __init__(self):
-        self.name = "contact_group_testing"
+        self.name = "cluster_group_testing"
 
 
     ### RUNNING THE ALGORITHM ###

@@ -14,7 +14,7 @@ class Logger:
         self.path = path
         if not os.path.exists(path):
             os.mkdir(path)
-        self.date = str(datetime.datetime.now()).replace(" ", "-").replace(":","-")
+        self.date = str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
         self.filename = ""
         self.log = {'problems': [], 'results': {}}
 
@@ -39,7 +39,7 @@ class Logger:
         Log the result of an algorithm after running it on all problems on the server
         """
         # Set filename of the log file
-        self.filename = f"{approx_score:.3f}_{algorithm}_{self.date}.json"
+        self.filename = f"{approx_score:.3f}_{proportion_correct}_{total_time:.2f}_{algorithm}_{self.date}.json"
 
         # Store overall results in a dictionary
         results = {"algorithm": algorithm, 
