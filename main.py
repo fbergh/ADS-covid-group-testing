@@ -2,7 +2,6 @@
 
 # Standard libary imports
 import time
-import os
 
 # Self-defined imports
 import input_output as io
@@ -60,12 +59,11 @@ def test_server():
 
     # Compute time required, proportion of tests used and proportion of correct results
     total_time = time.time() - start_time
-    proportion_correct = n_correct / n_problems
-    io.eprint(f"Time elapsed      = {total_time} sec")
-    io.eprint(f"Problems correct  = {proportion_correct}")
+    io.eprint(f"Time elapsed      = {total_time:.4f} sec")
+    io.eprint(f"Problems correct  = {n_correct}/{n_problems}")
     io.eprint(f"Approximate score = {int(approx_score)}")
     # Save results to a log file
-    l.log_algorithm_with_results(algorithm.name, total_time, int(approx_score), proportion_correct)
+    l.log_algorithm_with_results(algorithm.name, total_time, int(approx_score), n_correct)
     l.close()
 
 

@@ -1,9 +1,7 @@
 ########## IMPORTS ##########
 
 # Standard library imports
-import math
 import random
-import time
 
 # Self-defined imports
 from algorithm import Algorithm, Tester
@@ -64,12 +62,11 @@ class ClusterGroupTesting(Algorithm):
     def solve_all_components(self):
         # Set the correct number of groups, the test type in the base case and how to process a component
         p_group_infected = self.graph.n_initially_infected/len(self.connected_components)
-        n_groups = max(2, round(p_group_infected*100)) # Number of groups depends on probability that a group is infected
-        base_test = self.tester.test
+        n_groups = max(2, round(p_group_infected*50)) # Number of groups depends on probability that a group is infected
         process_item = self.solve_component
 
         # Recursively search for positive components
-        self.recursive_search(self.connected_components, n_groups, base_test, process_item)
+        self.recursive_search(self.connected_components, n_groups, process_item)
 
 
     ### SOLVING A SINGLE COMPONENT (WITH AT LEAST ONE POSITIVE NODE) ###
@@ -79,6 +76,7 @@ class ClusterGroupTesting(Algorithm):
         if len(component) == 1:
             assert self.tester.in_database(component[0]), "Solving component with single element, but element not stored in database"
             self.found_clusters.append(component)
+            return
         # While the total problem is not solved and the component is not fully solved:
         while not self._reached_thresholds() and not self.tester.done(component):
             # Sample some nodes from the component
@@ -88,10 +86,9 @@ class ClusterGroupTesting(Algorithm):
 
             # Look for clusters in the sample by recursively searching for positive nodes
             p_node_infected = (self.graph.upper_bound + self.graph.lower_bound)/(2*self.graph.n_nodes) # Number of groups depends on probability that a node is infected
-            n_groups = max(2, round(p_node_infected*100))
-            base_test = self.tester.test_unknown_only
-            process_item = self.explore_cluster
-            self.recursive_search(sample, n_groups, base_test, process_item)
+            n_groups = max(2, round(p_node_infected*50))
+            process_item = lambda node: self.explore_cluster(node) if not node in [n for c in self.found_clusters for n in c] else None
+            self.recursive_search(sample, n_groups, process_item)
 
             # Test the nodes that remain unknown once, to see if all clusters have been found
             if not self._reached_thresholds():
@@ -101,6 +98,9 @@ class ClusterGroupTesting(Algorithm):
     ### CLUSTER EXPLORATION ###
 
     def explore_cluster(self, source):
+        # Make sure the source is not already part of a cluster
+        assert source not in [node for c in self.found_clusters for node in c], "Exploring cluster that has already been explored"
+
         # Initialize lists for cluster and frontier
         cluster = [source]
         frontier = [source]
@@ -109,16 +109,17 @@ class ClusterGroupTesting(Algorithm):
         while frontier and not self._reached_thresholds():
             # Get the unknown neighbors of the current frontier
             neighbors = list(set([n for node in frontier for n in self.graph.graph[node]]))
+            new_neighbors = [n for n in neighbors if n not in cluster]
+            assert not any([self.tester.known_positive(n) for n in new_neighbors]), "Encountered known positive while expanding cluster"
             unknown_neighbors = [n for n in neighbors if not self.tester.in_database(n)]
             
             # If there are any unknown neighbors, retrieve the ones that are positive
             positive_neighbors = []
             if unknown_neighbors:
                 p_neighbor_infected = self.graph.p_infection
-                n_groups = max(2, round(p_neighbor_infected*100))
-                base_test = self.tester.test
+                n_groups = max(2, round(p_neighbor_infected*50))
                 process_item = lambda node: node
-                positive_neighbors = self.recursive_search(unknown_neighbors, n_groups, base_test, process_item, True)
+                positive_neighbors = self.recursive_search(unknown_neighbors, n_groups, process_item, True)
 
             # Update the frontier and the cluster
             frontier = positive_neighbors
@@ -204,7 +205,7 @@ class ClusterGroupTesting(Algorithm):
         # Return the list of all vertices reachable from the source
         return connected_component
 
-    def recursive_search(self, items, n_groups, base_test, process_item, return_result=False):
+    def recursive_search(self, items, n_groups, process_item, return_result=False):
         if return_result:
             results = []
 
@@ -212,7 +213,7 @@ class ClusterGroupTesting(Algorithm):
         if len(items) <= n_groups:
             for item in items:
                 if not self._reached_thresholds():
-                    if base_test(item):
+                    if self.tester.test(item):
                         if return_result:
                             results.append(process_item(item))
                         else:
@@ -229,9 +230,9 @@ class ClusterGroupTesting(Algorithm):
                     # If the group tests positive, recursively search the group
                     if self.tester.test(items[start:end]):
                         if return_result:
-                            results.extend(self.recursive_search(items[start:end], n_groups, base_test, process_item, return_result))
+                            results.extend(self.recursive_search(items[start:end], n_groups, process_item, return_result))
                         else:
-                            self.recursive_search(items[start:end], n_groups, base_test, process_item, return_result)
+                            self.recursive_search(items[start:end], n_groups, process_item, return_result)
         
         # If the result should be returned, return it
         if return_result:
@@ -251,8 +252,8 @@ class ClusterGroupTesting(Algorithm):
         group_size = list_length/n_groups
 
         # Compute the start and end indices corresponding to the given group index
-        start = math.floor(group_size*group_index)
-        end = math.floor(group_size*(group_index+1))
+        start = round(group_size*group_index)
+        end = round(group_size*(group_index+1))
 
         # Return the computed indices
         return start, end

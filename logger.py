@@ -14,7 +14,7 @@ class Logger:
         self.path = path
         if not os.path.exists(path):
             os.mkdir(path)
-        self.date = str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
+        self.date = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
         self.filename = ""
         self.log = {'problems': [], 'results': {}}
 
@@ -34,18 +34,18 @@ class Logger:
         # Log the problem
         self.log["problems"].append(problem_dict)
 
-    def log_algorithm_with_results(self, algorithm, total_time, approx_score, proportion_correct):
+    def log_algorithm_with_results(self, algorithm, total_time, approx_score, n_correct):
         """
         Log the result of an algorithm after running it on all problems on the server
         """
         # Set filename of the log file
-        self.filename = f"{approx_score:.3f}_{proportion_correct}_{total_time:.2f}_{algorithm}_{self.date}.json"
+        self.filename = f"{approx_score}_{n_correct}_{total_time:.2f}_{algorithm}_{self.date}.json"
 
         # Store overall results in a dictionary
         results = {"algorithm": algorithm, 
                    "total_time": total_time, 
                    "approx_score": approx_score,
-                   "proportion_correct": proportion_correct}
+                   "n_correct": n_correct}
 
         # Log results
         self.log["results"].update(results)

@@ -98,6 +98,9 @@ class Tester():
     def in_database(self, node):
         return node in self._database
 
+    def known_positive(self, node):
+        return node in self._database and self._database[node]
+
 
     ### CHECKING IF DONE ###
 
