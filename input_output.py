@@ -7,7 +7,7 @@ import sys
 ########## PROBLEM PARSING ##########
 
 def parse_number_of_problems():
-    # Parse the number of problems from server input
+    """ Parse the number of problems from server input """
     n_problems = int(input())
     eprint(f"Number of problems: {n_problems}")
     return n_problems
@@ -24,6 +24,7 @@ def get_values_from_input():
             with 0 < l <= i <= u <= 0.7n, with i the number of infections (just like in the real world,
             you already have an indication of how many people are infectious)
         (f) For each edge, a line with the two indices of the connected nodes
+    
     :return: the parsed values
     """
     # Try to parse and initialise all values and conditions of variables
@@ -76,44 +77,44 @@ def get_values_from_input():
 ########## SERVER INTERACTION ##########
 
 def give_credentials():
-    # Give credentials to the server
+    """ Give credentials to the server """
     with open('credentials') as c:
         username, password = c.readline().split(" ")
     print(username)
     print(password)
 
 def send_test(nodes):
-    # Send a test to the server for the given list of nodes
+    """ Send a test to the server for the given list of nodes """
     if type(nodes) == int:
         print("test", nodes, flush=True)
     else:
         print("test", *nodes, flush=True)
 
 def send_answer(nodes):
-    # Send the given list of nodes as an answer to the server
+    """ Send the given list of nodes as an answer to the server """
     if type(nodes) == int:
         print("answer", nodes, flush=True)
     else:
         print("answer", *nodes, flush=True)
 
 def get_test_result():
-    # Get the result of a test
+    """ Get the result of a test """
     return input() == "true"
 
 def get_problem_result():
-    # Get the result of the problem
+    """ Get the result of the problem """
     return input() == "success"
 
 
 ########## PRINTING ##########
 
 def pretty_print_input_params(input_params):
-    # Print all input parameters (except edges) in a neat way
+    """ Print all input parameters (except edges) in a neat way """
     for k, v in input_params.items():
         if k == "idcs_connected_nodes":
             continue
         eprint(f"{k:20} = {v}")
 
 def eprint(*args, **kwargs):
-    # Print to stderror (which logs to console for group testing server)
+    """ Print to stderror (which logs to console for group testing server) """
     print(*args, file=sys.stderr, **kwargs)

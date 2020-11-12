@@ -10,7 +10,6 @@ import json
 
 class Logger:
     def __init__(self, path):
-        super().__init__()
         self.path = path
         if not os.path.exists(path):
             os.mkdir(path)
@@ -19,9 +18,7 @@ class Logger:
         self.log = {'problems': [], 'results': {}}
 
     def log_problem(self, problem_params, is_success, n_tests):
-        """
-        Log a given problem, whether the algorithm succeeded in solving it and the number of tests the algorithm used
-        """
+        """ Log a given problem, whether the algorithm succeeded in solving it and the number of tests used """
         # We do not log edges, to avoid clutter
         del problem_params["idcs_connected_nodes"]
 
@@ -35,9 +32,7 @@ class Logger:
         self.log["problems"].append(problem_dict)
 
     def log_algorithm_with_results(self, algorithm, total_time, approx_score, n_correct):
-        """
-        Log the result of an algorithm after running it on all problems on the server
-        """
+        """ Log the result of an algorithm after running it on all problems on the server """
         # Set filename of the log file
         self.filename = f"{approx_score}_{n_correct}_{total_time:.2f}_{algorithm}_{self.date}.json"
 
@@ -51,6 +46,6 @@ class Logger:
         self.log["results"].update(results)
 
     def close(self):
-        # Dump everything that was logged to a json file
+        """ Store everything that was logged as a json file """
         with open(os.path.join(self.path, self.filename), 'w') as outfile:
             json.dump(self.log, outfile, indent="  ")

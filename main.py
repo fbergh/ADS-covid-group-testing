@@ -19,11 +19,11 @@ logs_dir = "./logs"
 
 def test_server():
     """
-    Run an algorithm on all problems on the server
+    Run the algorithm on all problems on the server
 
     Run this in the terminal with: ncat -c 'python3 ./main.py' group-testing.maarse.xyz 6525 (Mac)
                                    ncat -c "python .\main.py" group-testing.maarse.xyz 6525 (Windows)
-    NOTE: In order for this to run, there needs to be a credentials file in the repository (containing team name and password, separated by a space)
+    NOTE: In order for this to run, there needs to be a credentials file in the folder (containing team name and password, separated by a space)
     """
     # Setup: give credentials to server, parse number of problems, start counters for performance, start a timer, create a logger and choose an algorithm
     io.give_credentials()
