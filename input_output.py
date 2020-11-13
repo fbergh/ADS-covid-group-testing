@@ -76,13 +76,6 @@ def get_values_from_input():
 
 ########## SERVER INTERACTION ##########
 
-def give_credentials():
-    """ Give credentials to the server """
-    with open('credentials') as c:
-        username, password = c.readline().split(" ")
-    print(username)
-    print(password)
-
 def send_test(nodes):
     """ Send a test to the server for the given list of nodes """
     if type(nodes) == int:

@@ -21,12 +21,10 @@ def test_server():
     """
     Run the algorithm on all problems on the server
 
-    Run this in the terminal with: ncat -c 'python3 ./main.py' group-testing.maarse.xyz 6525 (Mac)
-                                   ncat -c "python .\main.py" group-testing.maarse.xyz 6525 (Windows)
-    NOTE: In order for this to run, there needs to be a credentials file in the folder (containing team name and password, separated by a space)
+    Run this in the terminal with: ncat -c 'echo 'USERNAME' && echo 'PASSWORD' && python3 ./main.py' group-testing.maarse.xyz 6525 (Mac)
+                                   ncat -c "echo "USERNAME" && echo "PASSWORD" && python .\main.py" group-testing.maarse.xyz 6525 (Windows)
     """
-    # Setup: give credentials to server, parse number of problems, start counters for performance, start a timer, create a logger and choose an algorithm
-    io.give_credentials()
+    # Setup: parse number of problems, start counters for performance, start a timer, create a logger and choose an algorithm
     n_problems = io.parse_number_of_problems()
     n_correct, approx_score = 0, 0
     start_time = time.time()

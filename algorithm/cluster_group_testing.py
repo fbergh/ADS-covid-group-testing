@@ -67,7 +67,7 @@ class ClusterGroupTesting(Algorithm):
         """ Solve the problem separately for all positive connected components """
         # Set the correct number of groups, the test type in the base case and how to process a component
         p_group_infected = self.graph.n_initially_infected/len(self.connected_components)
-        n_groups = max(2, round(p_group_infected*25)) # Number of groups depends on probability that a group is infected
+        n_groups = max(2, round(p_group_infected*75)) # Number of groups depends on probability that a group is infected
         process_item = self.solve_component
 
         # Recursively search for positive components
@@ -96,7 +96,7 @@ class ClusterGroupTesting(Algorithm):
 
             # Look for clusters in the sample by recursively searching for positive nodes
             p_node_infected = (self.graph.upper_bound + self.graph.lower_bound)/(2*self.graph.n_nodes) # Number of groups depends on probability that a node is infected
-            n_groups = max(2, round(p_node_infected*25))
+            n_groups = max(2, round(p_node_infected*75))
             process_item = lambda node: self.explore_cluster(node) if not node in [n for c in self.found_clusters for n in c] else None
             self.recursive_search(sample, n_groups, process_item)
 
@@ -174,7 +174,7 @@ class ClusterGroupTesting(Algorithm):
             positive_neighbors = []
             if unknown_neighbors:
                 p_neighbor_infected = self.graph.p_infection
-                n_groups = max(2, round(p_neighbor_infected*25))
+                n_groups = max(2, round(p_neighbor_infected*75))
                 process_item = lambda node: node
                 positive_neighbors = self.recursive_search(unknown_neighbors, n_groups, process_item, True)
 
