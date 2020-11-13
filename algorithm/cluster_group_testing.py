@@ -46,7 +46,7 @@ class ClusterGroupTesting(Algorithm):
             self.tester.fill_remaining(range(self.graph.n_nodes), False)
 
         # Verify we are done testing and extract the positive nodes 
-        assert self.tester.done(range(self.graph.n_nodes)), "The algorithm has not finished testing"
+        assert self.tester.in_database(range(self.graph.n_nodes)), "The algorithm has not finished testing"
         io.eprint("Extracting positive indices...")
         positive_indices = self.tester.get_positive_indices()
         io.eprint(f"Extracted {len(positive_indices)} positive indices.")
@@ -88,7 +88,7 @@ class ClusterGroupTesting(Algorithm):
             return
         
         # While the total problem is not solved and the component is not fully solved:
-        while not self.__reached_thresholds() and not self.tester.done(component):
+        while not self.__reached_thresholds() and not self.tester.in_database(component):
             # Sample some nodes from the component
             sample_size = max(5, 0.25*len(component))
             sample = self.sample(component, sample_size)
@@ -123,25 +123,25 @@ class ClusterGroupTesting(Algorithm):
         # Get all nodes from the component that have already been solved
         tested = set([v for v in component if self.tester.in_database(v)])
         # The initial set of nodes we can sample includes all untested nodes in the component
-        set_to_sample = component - tested
+        candidates = component - tested
 
         # Initialize a set of neighbors of sampled nodes (to avoid picking adjacent nodes if possible)
         neighbours = set()
 
         # While there are sample-able nodes and sample_size has not been reached:
-        while set_to_sample and len(sample) != sample_size:
+        while candidates and len(sample) != sample_size:
             # Sample a single node
-            node = random.sample(set_to_sample, 1)[0]
+            node = random.sample(candidates, 1)[0]
             assert not self.tester.in_database(node), "Sampled node already present in database"
             sample.add(node)
 
             # Add the neighbors of the sampled node to the list of neighbors to avoid sampling them if possible
-            neighbours.update([n for n in self.graph.graph[node] if n in set_to_sample])
+            neighbours.update([n for n in self.graph.graph[node] if n in candidates])
             # Update the set of nodes that can be sampled by removing the sampled node and its neighbors
-            set_to_sample = set_to_sample - sample - neighbours
+            candidates = candidates - sample - neighbours
         
-        # If set_to_sample is empty, fill the remaining space with some neighbors of already-sampled nodes to reach sample_size
-        if not set_to_sample:
+        # If list of candidates is empty, fill the remaining space with some neighbors of already-sampled nodes to reach sample_size
+        if not candidates:
             while len(neighbours) != 0 and len(sample) != sample_size:
                 node = random.sample(neighbours, 1)[0]
                 neighbours.remove(node)

@@ -112,11 +112,15 @@ class Tester():
         self.__database.update({node : result for node in nodes if node not in self.__database})
 
 
-    ### CHECKING IF SINGLE NODE IS IN DATABASE ###
+    ### CHECKING IF LIST OF NODES IS IN DATABASE ###
 
-    def in_database(self, node):
-        """ Check if a single node is already in the database """
-        return node in self.__database
+    def in_database(self, nodes):
+        """ Check if all nodes in the input (a single node or a list of nodes) are already in the database """
+        # Convert input to a flat list of nodes
+        nodes = self.__convert_to_flat_list(nodes)
+
+        # Check if all nodes are in the database
+        return all(node in self.__database for node in nodes)
 
     
     ### CHECKING FOR KNOWN POSITIVES ###
@@ -139,10 +143,6 @@ class Tester():
     def reached_max_infections(self):
         """ Check if the number of known positives has reached the maximum number of infections """
         return sum(self.__database.values()) >= self.__max_n_infections
-
-    def done(self, nodes):
-        """ Check if all nodes in a list of nodes are already in the database """
-        return all(node in self.__database for node in nodes)
 
     
     ### UTILITY FUNCTIONS ###
